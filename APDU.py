@@ -516,4 +516,23 @@ def main():
     p = argparse.ArgumentParser(description="JCSimOS extended single-file simulator+client.")
     p.add_argument("--mode", choices=["server", "client", "interactive"], default="interactive",
                    help="Modo: server | client | interactive")
-    p.add_argument("--host", default="127.0.0.1", he
+    p.add_argument("--host", default="127.0.0.1", help="Host para modo client")
+    p.add_argument("--port", type=int, default=9001, help="Port para servidor/client")
+    args = p.parse_args()
+
+    if args.mode == "server":
+        print(f"Iniciando servidor JCSimOS en 0.0.0.0:{args.port} (CTRL-C para parar)")
+        server = APDUServer(("0.0.0.0", args.port), APDUServerHandler)
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            print("Servidor detenido.")
+            server.shutdown()
+            server.server_close()
+    elif args.mode == "client":
+        client_mode(host=args.host, port=args.port)
+    else:
+        interactive_mode()
+
+if __name__ == "__main__":
+    main()
